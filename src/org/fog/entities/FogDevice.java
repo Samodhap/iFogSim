@@ -765,7 +765,7 @@ public class FogDevice extends PowerDatacenter {
 				.getAllocatedMipsForVm(module));
 	}
 	
-	private void initializePeriodicTuples(AppModule module) {
+	protected void initializePeriodicTuples(AppModule module) {
 		String appId = module.getAppId();
 		Application app = getApplicationMap().get(appId);
 		List<AppEdge> periodicEdges = app.getPeriodicEdges(module.getName());
