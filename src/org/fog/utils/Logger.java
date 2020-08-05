@@ -12,7 +12,7 @@ public class Logger {
 	public static int LOG_LEVEL = Logger.DEBUG;
 	private static DecimalFormat df = new DecimalFormat("#.00"); 
 
-	public static boolean ENABLED = false;;
+	public static boolean ENABLED = true;;
 	
 	public static void setLogLevel(int level){
 		Logger.LOG_LEVEL = level;
@@ -22,13 +22,13 @@ public class Logger {
 		if(!ENABLED)
 			return;
 		if(Logger.LOG_LEVEL <= Logger.DEBUG)
-			System.out.println(df.format(CloudSim.clock())+" : "+name+" : "+message);
+			System.out.println(df.format(CloudSim.clock())+" : DEBUG : "+name+" : "+message);
 	}
 	public static void error(String name, String message){
 		if(!ENABLED)
 			return;
 		if(Logger.LOG_LEVEL <= Logger.ERROR)
-			System.out.println(df.format(CloudSim.clock())+" : "+name+" : "+message);
+			System.out.println(df.format(CloudSim.clock())+" : ERROR : "+name+" : "+message);
 	}
 	
 }
