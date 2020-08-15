@@ -9,16 +9,20 @@ import org.fog.application.Application;
 import org.fog.application.selectivity.SelectivityModel;
 import org.fog.entities.Tuple;
 import org.fog.entities.microservicesBased.TupleM;
+import org.fog.scheduler.TupleScheduler;
 import org.fog.utils.FogUtils;
 import org.fog.utils.GeoCoverage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Samodha Pallewatta.
  */
 public class MicroservicesApplication extends Application {
+
+    QoSProfile qoSProfile = null;
 
     public static MicroservicesApplication createApplication(String appId, int userId) {
         return new MicroservicesApplication(appId, userId);
@@ -30,6 +34,22 @@ public class MicroservicesApplication extends Application {
 
     public MicroservicesApplication(String appId, List<AppModule> modules, List<AppEdge> edges, List<AppLoop> loops, GeoCoverage geoCoverage) {
         super(appId, modules, edges, loops, geoCoverage);
+    }
+
+    /**
+     * @param moduleName
+     * @param ram
+     * @param mips
+     * @param size
+     */
+    public void addAppModule(String moduleName, int ram, int mips, int size) {
+        long bw = 1000;
+        String vmm = "Xen";
+
+        AppModule module = new AppModule(FogUtils.generateEntityId(), moduleName, getAppId(), getUserId(),
+                mips, ram, bw, size, vmm, new TupleScheduler(mips, 1), new HashMap<Pair<String, String>, SelectivityModel>());
+
+        getModules().add(module);
     }
 
 
@@ -146,5 +166,14 @@ public class MicroservicesApplication extends Application {
         }
         return null;
     }
+
+    public void setQoSProfile(QoSProfile qoSProfile) {
+        this.qoSProfile = qoSProfile;
+    }
+
+    public QoSProfile getQoSProfile() {
+        return qoSProfile;
+    }
+
 
 }
