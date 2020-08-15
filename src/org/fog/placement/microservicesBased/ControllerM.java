@@ -24,6 +24,7 @@ public class ControllerM extends SimEntity {
     private List<FogDevice> fogDevices;
     private List<Sensor> sensors;
     private Map<String, Application> applications = new HashMap<>();
+    private PlacementLogicFactory placementLogicFactory = new PlacementLogicFactory();
 
     /**
      * @param name
@@ -33,7 +34,7 @@ public class ControllerM extends SimEntity {
      * @param clusterLevelIdentifier - Names of devices of this level starts with this id
      * @param clusterLatency
      */
-    public ControllerM(String name, List<FogDevice> fogDevices, List<Sensor> sensors, List<Application> applications, List<String> clusterLevelIdentifier, Double clusterLatency) {
+    public ControllerM(String name, List<FogDevice> fogDevices, List<Sensor> sensors, List<Application> applications, List<String> clusterLevelIdentifier, Double clusterLatency, int placementLogic) {
         super(name);
         this.fogDevices = fogDevices;
         this.sensors = sensors;
@@ -45,7 +46,7 @@ public class ControllerM extends SimEntity {
             createClusterConnections(id, fogDevices, clusterLatency);
         printClusterConnections();
 
-        initializeControllers();
+        initializeControllers(placementLogic);
         generateRoutingTable();
         setClientModulesToDeply();
     }
@@ -96,7 +97,7 @@ public class ControllerM extends SimEntity {
         }
     }
 
-    private void initializeControllers() {
+    private void initializeControllers(int placementLogic) {
         for (FogDevice device : fogDevices) {
             LoadBalancer loadBalancer = new WRRLoadBalancer();
             ClusteredFogDevice cdevice = (ClusteredFogDevice) device;
@@ -104,7 +105,7 @@ public class ControllerM extends SimEntity {
             //responsible for placement decision making
             if (cdevice.getDevicType().equals(ClusteredFogDevice.FON) || cdevice.getDevicType().equals(ClusteredFogDevice.CLOUD)) {
                 List<FogDevice> monitoredDevices = getDevicesForFON(cdevice);
-                MicroservicePlacementLogic microservicePlacementLogic = new EdgewardMicroservicePlacementLogic(cdevice.getId());
+                MicroservicePlacementLogic microservicePlacementLogic = placementLogicFactory.getPlacementLogic(placementLogic, cdevice.getId());
                 cdevice.initializeController(loadBalancer, microservicePlacementLogic, getResourceInfo(monitoredDevices), applications, monitoredDevices);
             } else if (cdevice.getDevicType().equals(ClusteredFogDevice.FCN) || cdevice.getDevicType().equals(ClusteredFogDevice.CLIENT)) {
                 cdevice.initializeController(loadBalancer);
